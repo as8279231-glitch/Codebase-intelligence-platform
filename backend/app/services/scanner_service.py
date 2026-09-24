@@ -24,6 +24,13 @@ def scan_repository(repository_path: str):
         if any(folder in file.parts for folder in IGNORE_FOLDERS):
             continue
 
-        files.append(str(file.relative_to(repository)))
+        files.append(
+    {
+        "name": file.name,
+        "path": str(file.relative_to(repository)),
+        "extension": file.suffix,
+        "size": file.stat().st_size
+    }
+)
 
     return sorted(files)
