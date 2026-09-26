@@ -4,7 +4,7 @@ from app.services.dependency_service import build_dependency_graph
 from app.services.metrics_service import calculate_repository_metrics
 from app.services.complexity_service import calculate_repository_complexity
 from app.services.call_graph_service import build_repository_call_graph
-
+from app.services.dead_code_service import detect_dead_code
 
 def analyze_repository(repository_path: str):
 
@@ -26,6 +26,9 @@ def analyze_repository(repository_path: str):
     call_graph = build_repository_call_graph(
         repository_path
     )
+    dead_code = detect_dead_code(
+    repository_path
+   )
 
     return {
         "repository": analysis["repository"],
