@@ -42,7 +42,9 @@ from app.services.analysis_service import analyze_repository
 @router.post("/repository/analyze")
 def analyze_repository_endpoint(request: RepositoryParseRequest):
 
-    return analyze_repository(request.repository_path)
+    result = analyze_repository(request.repository_path)
+
+    return result
 
 
 @router.post("/repository/dependencies")
