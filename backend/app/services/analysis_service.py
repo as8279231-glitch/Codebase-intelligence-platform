@@ -14,7 +14,14 @@ from app.services.graph_service import generate_dependency_graph
 from app.services.insights_service import generate_repository_insights
 from app.services.architecture_service import analyze_architecture
 from app.services.tree_service import build_repository_tree
-
+from app.services.top_complexity_service import get_top_complex_functions
+from app.services.technical_debt_service import calculate_technical_debt
+from app.services.dashboard_service import generate_dashboard
+from app.services.hotspot_service import detect_hotspots
+from app.services.duplicate_service import detect_duplicate_blocks
+from app.services.maintainability_service import calculate_maintainability_index
+from app.services.badge_service import generate_quality_badge
+from app.services.documentation_service import analyze_documentation
 
 
 
@@ -49,6 +56,10 @@ def analyze_repository(repository_path: str):
         repository_path
     )
 
+    top_complex_functions = get_top_complex_functions(
+    complexity
+    )
+
     call_graph = build_repository_call_graph(
         repository_path
     )
@@ -65,8 +76,26 @@ def analyze_repository(repository_path: str):
         repository_path
     )
 
+    duplicate = detect_duplicate_blocks(
+    repository_path
+    )
+
     security = scan_security(
         repository_path
+    )
+
+    technical_debt = calculate_technical_debt(
+        dead_code,
+        todos,
+        security,
+        code_smells
+    )
+
+    hotspots = detect_hotspots(
+    complexity,
+    dead_code,
+    todos,
+    code_smells
     )
 
     health = calculate_health_score(
@@ -77,7 +106,33 @@ def analyze_repository(repository_path: str):
         security
     )
 
-    print("\n===== CALLING INSIGHTS SERVICE =====")
+    maintainability = calculate_maintainability_index(
+    metrics,
+    complexity,
+    dead_code,
+    code_smells
+    )
+
+    badge = generate_quality_badge(
+    health,
+    maintainability,
+    security
+    )
+
+    documentation = analyze_documentation(
+    repository_path
+    )
+    
+    dashboard = generate_dashboard(
+    summary,
+    metrics,
+    complexity,
+    health,
+    security,
+    dead_code,
+    todos,
+    code_smells
+    )
 
     insights = generate_repository_insights(
     summary,
@@ -89,10 +144,6 @@ def analyze_repository(repository_path: str):
     health
     )
 
-    print("\n===== RETURNED INSIGHTS =====")
-    print(insights)
-
-    
     recommendations = generate_recommendations(
     health,
     security,
@@ -100,10 +151,6 @@ def analyze_repository(repository_path: str):
     dead_code,
     complexity
     )
-
-
-    print("===== ANALYSIS RESULT =====")
-    print("Health:", health)
 
     return {
         "repository": analysis["repository"],
@@ -114,12 +161,20 @@ def analyze_repository(repository_path: str):
         "dependencies": dependencies,
         "dependency_graph_image":graph,
         "complexity": complexity,
+        "top_complex_functions": top_complex_functions,
         "call_graph": call_graph,
         "dead_code": dead_code,
         "todos": todos,
         "code_smells": code_smells,
+        "duplicate": duplicate,
         "security": security,
+        "technical_debt": technical_debt,
+        "hotspots": hotspots,
         "health": health,
+        "maintainability": maintainability,
+        "quality_badge": badge,
+        "documentation": documentation,
+        "dashboard": dashboard,
         "insights": insights,
         "recommendations": recommendations,
         "parsed_files": analysis["parsed_files"]
