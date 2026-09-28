@@ -13,6 +13,10 @@ from app.services.recommendation_service import generate_recommendations
 from app.services.graph_service import generate_dependency_graph
 from app.services.insights_service import generate_repository_insights
 from app.services.architecture_service import analyze_architecture
+from app.services.tree_service import build_repository_tree
+
+
+
 
 
 
@@ -21,6 +25,10 @@ def analyze_repository(repository_path: str):
     analysis = parse_repository(repository_path)
 
     summary = generate_repository_summary(analysis)
+
+    repository_tree = build_repository_tree(
+    repository_path
+    )
 
     dependencies = build_dependency_graph(analysis)
 
@@ -100,6 +108,7 @@ def analyze_repository(repository_path: str):
     return {
         "repository": analysis["repository"],
         "summary": summary,
+        "repository_tree": repository_tree,
         "architecture": architecture,
         "metrics": metrics,
         "dependencies": dependencies,
