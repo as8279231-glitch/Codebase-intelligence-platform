@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 KEYWORDS = (
     "TODO",
     "FIXME",
@@ -13,7 +12,14 @@ def scan_todos(repository_path: str):
 
     repository = Path(repository_path)
 
-    todos = []
+    items = []
+
+    counts = {
+        "TODO": 0,
+        "FIXME": 0,
+        "BUG": 0,
+        "HACK": 0
+    }
 
     for file in repository.rglob("*"):
 
@@ -21,29 +27,28 @@ def scan_todos(repository_path: str):
             continue
 
         try:
+
             lines = file.read_text(
                 encoding="utf-8",
                 errors="ignore"
             ).splitlines()
 
-            for line_number, line in enumerate(lines, start=1):
+            for number, line in enumerate(lines, start=1):
 
-                upper_line = line.upper()
+                upper = line.upper()
 
                 for keyword in KEYWORDS:
 
-                    if keyword in upper_line:
+                    if keyword in upper:
 
-                        todos.append(
-                            {
-                                "file": str(
-                                    file.relative_to(repository)
-                                ),
-                                "line": line_number,
-                                "type": keyword,
-                                "comment": line.strip()
-                            }
-                        )
+                        counts[keyword] += 1
+
+                        items.append({
+                            "file": str(file.relative_to(repository)),
+                            "line": number,
+                            "type": keyword,
+                            "comment": line.strip()
+                        })
 
                         break
 
@@ -51,6 +56,7 @@ def scan_todos(repository_path: str):
             continue
 
     return {
-        "total_items": len(todos),
-        "items": todos
+        "total_items": len(items),
+        "counts": counts,
+        "items": items
     }

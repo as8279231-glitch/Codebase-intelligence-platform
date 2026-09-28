@@ -8,6 +8,12 @@ from app.services.dead_code_service import detect_dead_code
 from app.services.todo_service import scan_todos
 from app.services.code_smell_service import detect_code_smells
 from app.services.security_service import scan_security
+from app.services.health_service import calculate_health_score
+from app.services.recommendation_service import generate_recommendations
+from app.services.graph_service import generate_dependency_graph
+from app.services.insights_service import generate_repository_insights
+from app.services.architecture_service import analyze_architecture
+
 
 
 def analyze_repository(repository_path: str):
@@ -17,6 +23,14 @@ def analyze_repository(repository_path: str):
     summary = generate_repository_summary(analysis)
 
     dependencies = build_dependency_graph(analysis)
+
+    graph = generate_dependency_graph(
+    dependencies
+    )
+
+    architecture = analyze_architecture(
+    repository_path
+    )
 
     metrics = calculate_repository_metrics(
         repository_path,
@@ -47,16 +61,58 @@ def analyze_repository(repository_path: str):
         repository_path
     )
 
+    health = calculate_health_score(
+        metrics,
+        complexity,
+        dead_code,
+        todos,
+        security
+    )
+
+    print("\n===== CALLING INSIGHTS SERVICE =====")
+
+    insights = generate_repository_insights(
+    summary,
+    metrics,
+    complexity,
+    dead_code,
+    todos,
+    security,
+    health
+    )
+
+    print("\n===== RETURNED INSIGHTS =====")
+    print(insights)
+
+    
+    recommendations = generate_recommendations(
+    health,
+    security,
+    todos,
+    dead_code,
+    complexity
+    )
+
+
+    print("===== ANALYSIS RESULT =====")
+    print("Health:", health)
+
     return {
         "repository": analysis["repository"],
         "summary": summary,
+        "architecture": architecture,
         "metrics": metrics,
         "dependencies": dependencies,
+        "dependency_graph_image":graph,
         "complexity": complexity,
         "call_graph": call_graph,
         "dead_code": dead_code,
         "todos": todos,
         "code_smells": code_smells,
         "security": security,
+        "health": health,
+        "insights": insights,
+        "recommendations": recommendations,
         "parsed_files": analysis["parsed_files"]
+        
     }

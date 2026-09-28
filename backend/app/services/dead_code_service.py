@@ -6,38 +6,60 @@ def detect_dead_code(repository_path: str):
 
     repository = Path(repository_path)
 
-    defined_functions = set()
-    called_functions = set()
+    defined = {}
+    called = set()
 
     for file in repository.rglob("*.py"):
 
         try:
-            source_code = file.read_text(encoding="utf-8")
-            tree = ast.parse(source_code)
+            tree = ast.parse(
+                file.read_text(
+                    encoding="utf-8",
+                    errors="ignore"
+                )
+            )
+
+            relative = str(file.relative_to(repository))
 
             for node in ast.walk(tree):
 
                 if isinstance(node, ast.FunctionDef):
-                    defined_functions.add(node.name)
+
+                    defined[node.name] = {
+                        "file": relative,
+                        "line": node.lineno
+                    }
 
                 elif isinstance(node, ast.Call):
 
                     if isinstance(node.func, ast.Name):
-                        called_functions.add(node.func.id)
+                        called.add(node.func.id)
 
                     elif isinstance(node.func, ast.Attribute):
-                        called_functions.add(node.func.attr)
+                        called.add(node.func.attr)
 
         except Exception:
             continue
 
-    unused_functions = sorted(
-        defined_functions - called_functions
+    unused = []
+
+    for function, info in defined.items():
+
+        if function not in called:
+
+            unused.append({
+                "function": function,
+                "file": info["file"],
+                "line": info["line"]
+            })
+
+    unused.sort(
+        key=lambda x: x["function"]
     )
 
     return {
-        "total_functions": len(defined_functions),
-        "used_functions": len(called_functions),
-        "unused_functions": unused_functions,
-        "unused_count": len(unused_functions)
+        "total_functions": len(defined),
+        "used_functions": len(called),
+        "unused_count": len(unused),
+        "unused_functions": unused
     }
