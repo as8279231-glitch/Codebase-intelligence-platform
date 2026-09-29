@@ -28,6 +28,11 @@ from app.services.license_service import detect_license
 from app.services.gitignore_service import analyze_gitignore
 from app.services.repository_size_service import analyze_repository_size
 from app.services.import_statistics_service import analyze_imports
+from app.services.test_coverage_service import estimate_test_coverage
+from app.services.timeline_service import analyze_repository_timeline
+from app.services.language_stats_service import analyze_language_statistics
+from app.services.fingerprint_service import generate_repository_fingerprint
+from app.services.ownership_service import analyze_code_ownership
 
 
 
@@ -128,6 +133,26 @@ def analyze_repository(repository_path: str):
     repository_path
     )
 
+    test_coverage = estimate_test_coverage(
+    repository_path
+    )
+
+    timeline = analyze_repository_timeline(
+    repository_path
+    )
+
+    language_statistics = analyze_language_statistics(
+    repository_path
+    )
+
+    fingerprint = generate_repository_fingerprint(
+    repository_path
+    )
+
+    ownership = analyze_code_ownership(
+    repository_path
+    )
+
     languages = analyze_languages(
     repository_path
     )
@@ -203,6 +228,11 @@ def analyze_repository(repository_path: str):
         "maintainability": maintainability,
         "quality_badge": badge,
         "documentation": documentation,
+        "test_coverage": test_coverage,
+        "timeline": timeline,
+        "language_statistics": language_statistics,
+        "fingerprint": fingerprint,
+        "ownership": ownership,
         "languages": languages,
         "license": license_info,
         "gitignore": gitignore,
