@@ -22,7 +22,12 @@ from app.services.duplicate_service import detect_duplicate_blocks
 from app.services.maintainability_service import calculate_maintainability_index
 from app.services.badge_service import generate_quality_badge
 from app.services.documentation_service import analyze_documentation
-
+from app.services.churn_service import estimate_code_churn
+from app.services.language_service import analyze_languages
+from app.services.license_service import detect_license
+from app.services.gitignore_service import analyze_gitignore
+from app.services.repository_size_service import analyze_repository_size
+from app.services.import_statistics_service import analyze_imports
 
 
 
@@ -122,6 +127,30 @@ def analyze_repository(repository_path: str):
     documentation = analyze_documentation(
     repository_path
     )
+
+    languages = analyze_languages(
+    repository_path
+    )
+
+    license_info = detect_license(
+    repository_path
+    )
+
+    gitignore = analyze_gitignore(
+    repository_path
+    )
+
+    repository_size = analyze_repository_size(
+    repository_path
+    )
+
+    import_stats = analyze_imports(
+    repository_path
+    )
+
+    churn = estimate_code_churn(
+    repository_path
+    )
     
     dashboard = generate_dashboard(
     summary,
@@ -174,6 +203,12 @@ def analyze_repository(repository_path: str):
         "maintainability": maintainability,
         "quality_badge": badge,
         "documentation": documentation,
+        "languages": languages,
+        "license": license_info,
+        "gitignore": gitignore,
+        "repository_size": repository_size,
+        "import_statistics": import_stats,
+        "code_churn": churn,
         "dashboard": dashboard,
         "insights": insights,
         "recommendations": recommendations,
