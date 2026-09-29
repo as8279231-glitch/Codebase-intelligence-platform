@@ -23,7 +23,6 @@ from app.services.maintainability_service import calculate_maintainability_index
 from app.services.badge_service import generate_quality_badge
 from app.services.documentation_service import analyze_documentation
 from app.services.churn_service import estimate_code_churn
-from app.services.language_service import analyze_languages
 from app.services.license_service import detect_license
 from app.services.gitignore_service import analyze_gitignore
 from app.services.repository_size_service import analyze_repository_size
@@ -33,6 +32,11 @@ from app.services.timeline_service import analyze_repository_timeline
 from app.services.language_stats_service import analyze_language_statistics
 from app.services.fingerprint_service import generate_repository_fingerprint
 from app.services.ownership_service import analyze_code_ownership
+from app.services.chart_service import generate_repository_charts
+from app.services.naming_service import analyze_naming_quality
+from app.services.cohesion_service import analyze_cohesion
+from app.services.coupling_service import analyze_coupling
+from app.services.repository_score_service import calculate_repository_score
 
 
 
@@ -145,6 +149,16 @@ def analyze_repository(repository_path: str):
     repository_path
     )
 
+    charts = generate_repository_charts(
+    metrics,
+    complexity,
+    language_statistics,
+    code_smells,
+    security,
+    todos,
+    dead_code
+    )
+
     fingerprint = generate_repository_fingerprint(
     repository_path
     )
@@ -153,7 +167,15 @@ def analyze_repository(repository_path: str):
     repository_path
     )
 
-    languages = analyze_languages(
+    naming = analyze_naming_quality(
+    repository_path
+    )
+
+    cohesion = analyze_cohesion(
+    repository_path
+    )
+
+    coupling = analyze_coupling(
     repository_path
     )
 
@@ -186,6 +208,16 @@ def analyze_repository(repository_path: str):
     dead_code,
     todos,
     code_smells
+    )
+
+    repository_score = calculate_repository_score(
+    health,
+    maintainability,
+    security,
+    documentation,
+    complexity,
+    duplicate,
+    technical_debt
     )
 
     insights = generate_repository_insights(
@@ -228,12 +260,16 @@ def analyze_repository(repository_path: str):
         "maintainability": maintainability,
         "quality_badge": badge,
         "documentation": documentation,
+        "repository_score": repository_score,
         "test_coverage": test_coverage,
         "timeline": timeline,
         "language_statistics": language_statistics,
+        "charts": charts,
         "fingerprint": fingerprint,
         "ownership": ownership,
-        "languages": languages,
+        "naming": naming,
+        "cohesion": cohesion,
+        "coupling": coupling,
         "license": license_info,
         "gitignore": gitignore,
         "repository_size": repository_size,

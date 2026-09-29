@@ -1,0 +1,82 @@
+from collections import Counter
+
+
+def generate_repository_charts(
+    metrics,
+    complexity,
+    language_statistics,
+    code_smells,
+    security,
+    todos,
+    dead_code
+):
+
+    charts = {}
+
+    # -----------------------------
+    # Language Distribution
+    # -----------------------------
+
+    charts["language_distribution"] = {
+        "type": "pie",
+        "title": "Language Distribution",
+        "labels": list(language_statistics["languages"].keys()),
+        "values": list(language_statistics["languages"].values())
+    }
+
+    # -----------------------------
+    # Complexity Distribution
+    # -----------------------------
+
+    complexity_levels = Counter()
+
+    for file in complexity.get("files", []):
+
+        score = file.get("complexity", 0)
+
+        if score <= 5:
+            complexity_levels["Low"] += 1
+        elif score <= 10:
+            complexity_levels["Medium"] += 1
+        else:
+            complexity_levels["High"] += 1
+
+    charts["complexity_distribution"] = {
+        "type": "bar",
+        "title": "Complexity Distribution",
+        "labels": list(complexity_levels.keys()),
+        "values": list(complexity_levels.values())
+    }
+
+    # -----------------------------
+    # Issues
+    # -----------------------------
+
+    charts["issue_breakdown"] = {
+        "type": "bar",
+        "title": "Repository Issues",
+        "labels": [
+            "Security",
+            "Code Smells",
+            "TODOs",
+            "Dead Code"
+        ],
+        "values": [
+            security.get("total_issues", 0),
+            code_smells.get("total_smells", 0),
+            todos.get("total_items", 0),
+            dead_code.get("unused_count", 0)
+        ]
+    }
+
+    # -----------------------------
+    # Health Score
+    # -----------------------------
+
+    charts["health_score"] = {
+        "type": "gauge",
+        "title": "Repository Health",
+        "value": metrics.get("health_score", 0)
+    }
+
+    return charts
