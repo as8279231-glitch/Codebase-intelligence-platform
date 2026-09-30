@@ -37,6 +37,7 @@ from app.services.naming_service import analyze_naming_quality
 from app.services.cohesion_service import analyze_cohesion
 from app.services.coupling_service import analyze_coupling
 from app.services.repository_score_service import calculate_repository_score
+from app.services.module_dependency_service import analyze_module_dependencies
 
 
 
@@ -45,13 +46,14 @@ def analyze_repository(repository_path: str):
 
     analysis = parse_repository(repository_path)
 
-    summary = generate_repository_summary(analysis)
-
+    
     repository_tree = build_repository_tree(
     repository_path
     )
 
     dependencies = build_dependency_graph(analysis)
+
+    module_dependencies = analyze_module_dependencies(analysis)  
 
     graph = generate_dependency_graph(
     dependencies
@@ -64,6 +66,11 @@ def analyze_repository(repository_path: str):
     metrics = calculate_repository_metrics(
         repository_path,
         analysis
+    )
+
+    summary = generate_repository_summary(
+    analysis,
+    metrics
     )
 
     complexity = calculate_repository_complexity(
@@ -156,7 +163,8 @@ def analyze_repository(repository_path: str):
     code_smells,
     security,
     todos,
-    dead_code
+    dead_code,
+    health
     )
 
     fingerprint = generate_repository_fingerprint(
@@ -240,11 +248,12 @@ def analyze_repository(repository_path: str):
 
     return {
         "repository": analysis["repository"],
-        "summary": summary,
         "repository_tree": repository_tree,
         "architecture": architecture,
         "metrics": metrics,
+        "summary": summary,
         "dependencies": dependencies,
+        "module_dependencies": module_dependencies,
         "dependency_graph_image":graph,
         "complexity": complexity,
         "top_complex_functions": top_complex_functions,

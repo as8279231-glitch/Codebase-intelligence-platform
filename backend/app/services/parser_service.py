@@ -85,6 +85,7 @@ def parse_python_file(file_path: str):
         "functions": functions
     }
 
+
 def parse_repository(repository_path: str):
 
     repository = Path(repository_path)

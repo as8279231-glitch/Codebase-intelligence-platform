@@ -8,7 +8,8 @@ def generate_repository_charts(
     code_smells,
     security,
     todos,
-    dead_code
+    dead_code,
+    health
 ):
 
     charts = {}
@@ -76,7 +77,7 @@ def generate_repository_charts(
     charts["health_score"] = {
         "type": "gauge",
         "title": "Repository Health",
-        "value": metrics.get("health_score", 0)
+       "value": health.get("score",0)
     }
 
     return charts

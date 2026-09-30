@@ -1,14 +1,15 @@
 from collections import Counter
 
 
-def generate_repository_summary(repository_analysis):
+def generate_repository_summary(
+    repository_analysis,
+    metrics
+):
 
     total_functions = 0
     total_classes = 0
     total_imports = 0
 
-    largest_file = ""
-    largest_function_count = -1
 
     imports_counter = Counter()
 
@@ -23,9 +24,7 @@ def generate_repository_summary(repository_analysis):
 
         imports_counter.update(file["imports"])
 
-        if len(file["functions"]) > largest_function_count:
-            largest_function_count = len(file["functions"])
-            largest_file = file["file_name"]
+    
 
     return {
         "repository": repository_analysis["repository"],
@@ -33,6 +32,6 @@ def generate_repository_summary(repository_analysis):
         "total_functions": total_functions,
         "total_classes": total_classes,
         "total_imports": total_imports,
-        "largest_file": largest_file,
+       "largest_file": metrics["largest_file"],
         "most_imported_modules": imports_counter.most_common(10)
     }
