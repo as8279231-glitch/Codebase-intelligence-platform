@@ -1,11 +1,30 @@
 import { useState } from "react";
+import api from "../services/api";
+
 
 function AnalyzeCard() {
   const [path, setPath] = useState("");
 
-  function handleAnalyze() {
-    console.log(path);
-  }
+ async function handleAnalyze() {
+
+    try {
+
+        const response = await api.post(
+            "/repository/analyze",
+            {
+                repository_path: path
+            }
+        );
+
+        console.log(response.data);
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-8">
