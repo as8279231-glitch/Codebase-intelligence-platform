@@ -1,43 +1,46 @@
-function StatCard({ title, value, color }) {
-  return (
-    <div className="bg-white rounded-2xl shadow-md p-6">
-      <h3 className="text-gray-500 text-sm">{title}</h3>
+import MetricCard from "./MetricCard";
 
-      <h1 className={`text-4xl font-bold mt-3 ${color}`}>
-        {value}
-      </h1>
-    </div>
-  );
-}
+import {
+  FaPython,
+  FaCode,
+  FaCube,
+  FaFileCode,
+} from "react-icons/fa";
 
-export default function StatsCards({ metrics }) {
+function StatsCards({ metrics }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-      <StatCard
+      <MetricCard
         title="Python Files"
         value={metrics.total_python_files}
-        color="text-blue-600"
+        icon={<FaPython />}
+        color="bg-blue-600"
       />
 
-      <StatCard
+      <MetricCard
         title="Functions"
         value={metrics.total_functions}
-        color="text-green-600"
+        icon={<FaCode />}
+        color="bg-green-600"
       />
 
-      <StatCard
+      <MetricCard
         title="Classes"
         value={metrics.total_classes}
-        color="text-purple-600"
+        icon={<FaCube />}
+        color="bg-purple-600"
       />
 
-      <StatCard
+      <MetricCard
         title="Lines of Code"
         value={metrics.loc}
-        color="text-orange-600"
+        icon={<FaFileCode />}
+        color="bg-orange-500"
       />
 
     </div>
   );
 }
+
+export default StatsCards;
