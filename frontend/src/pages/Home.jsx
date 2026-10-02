@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import Navbar from "../components/Navbar";
 import AnalyzeCard from "../components/AnalyzeCard";
 
@@ -9,109 +11,80 @@ import RecommendationsCard from "../components/dashboard/RecommendationsCard";
 import InsightsCard from "../components/dashboard/InsightsCard";
 import DependencyGraph from "../components/dashboard/DependencyGraph";
 
-const demoData = {
-  repository_score: {
-    score: 90,
-    rating: "Excellent",
-  },
-
-  health: {
-    score: 100,
-    grade: "A+",
-  },
-
-  summary: {
-    total_python_files: 2,
-    total_functions: 1,
-    total_classes: 0,
-  },
-
-  metrics: {
-    loc: 5,
-  },
-
-  repository_tree: {
-    tree: `Test_repo
-├── main.py
-├── README.md
-├── requirements.txt
-└── utils.py`,
-  },
-
-  recommendations: [
-    "No security issues detected.",
-    "Complexity is healthy.",
-    "Repository is production ready.",
-    "No dead code detected.",
-  ],
-
-  insights: {
-    executive_summary:
-      "Repository health is excellent. The project follows a clean architecture with minimal complexity.",
-
-    strengths: [
-      "Low cyclomatic complexity",
-      "Excellent maintainability",
-      "No detected vulnerabilities",
-    ],
-
-    risks: [],
-  },
-
-  dependency_graph_image: {
-    image: "https://placehold.co/900x450?text=Dependency+Graph",
-  },
-};
-
 function Home() {
+  const [analysis, setAnalysis] = useState(null);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
 
       <div className="max-w-6xl mx-auto py-10 px-6">
 
-        <AnalyzeCard />
+        <AnalyzeCard onAnalyze={setAnalysis} />
 
-        <div className="mt-8">
-          <RepositoryScoreCard score={demoData.repository_score} />
-        </div>
+        {!analysis && (
+          <div className="mt-10 bg-white rounded-xl shadow-md p-8 text-center text-gray-500">
+            Analyze a repository to view the dashboard.
+          </div>
+        )}
 
-        <div className="mt-8">
-          <StatsCards
-            metrics={{
-              total_python_files: demoData.summary.total_python_files,
-              total_functions: demoData.summary.total_functions,
-              total_classes: demoData.summary.total_classes,
-              loc: demoData.metrics.loc,
-            }}
-          />
-        </div>
+        {analysis && (
+          <>
+            <div className="mt-8">
+              <RepositoryScoreCard
+                score={analysis.repository_score}
+              />
+            </div>
 
-        <div className="mt-8">
-          <HealthCard health={demoData.health} />
-        </div>
+            <div className="mt-8">
+              <StatsCards
+                metrics={{
+                  total_python_files:
+                    analysis.summary.total_python_files,
 
-        <div className="mt-8">
-          <RepositoryTree tree={demoData.repository_tree.tree} />
-        </div>
+                  total_functions:
+                    analysis.summary.total_functions,
 
-        <div className="mt-8">
-          <RecommendationsCard
-            recommendations={demoData.recommendations}
-          />
-        </div>
+                  total_classes:
+                    analysis.summary.total_classes,
 
-        <div className="mt-8">
-          <InsightsCard
-            insights={demoData.insights}
-          />
-        </div>
+                  loc:
+                    analysis.metrics.total_lines_of_code,
+                }}
+              />
+            </div>
 
-        <div className="mt-8">
-          <DependencyGraph
-            image={demoData.dependency_graph_image.image}
-          />
-        </div>
+            <div className="mt-8">
+              <HealthCard
+                health={analysis.health}
+              />
+            </div>
+
+            <div className="mt-8">
+              <RepositoryTree
+                tree={analysis.repository_tree.tree}
+              />
+            </div>
+
+            <div className="mt-8">
+              <RecommendationsCard
+                recommendations={analysis.recommendations}
+              />
+            </div>
+
+            <div className="mt-8">
+              <InsightsCard
+                insights={analysis.insights}
+              />
+            </div>
+
+            <div className="mt-8">
+              <DependencyGraph
+                image={`http://127.0.0.1:8000/${analysis.dependency_graph_image.image.replace(/\\/g, "/")}`}
+              />
+            </div>
+          </>
+        )}
 
       </div>
     </div>

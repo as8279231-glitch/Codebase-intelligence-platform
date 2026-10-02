@@ -1,34 +1,34 @@
 import { useState } from "react";
 import api from "../services/api";
 
-
-function AnalyzeCard() {
+function AnalyzeCard({ onAnalyze }) {
   const [path, setPath] = useState("");
+  const [loading, setLoading] = useState(false);
 
- async function handleAnalyze() {
-
-    try {
-
-        const response = await api.post(
-            "/repository/analyze",
-            {
-                repository_path: path
-            }
-        );
-
-        console.log(response.data);
-
-    } catch (error) {
-
-        console.error(error);
-
+  async function handleAnalyze() {
+    if (!path.trim()) {
+      alert("Please enter a repository path.");
+      return;
     }
 
-}
+    setLoading(true);
+
+    try {
+      const response = await api.post("/repository/analyze", {
+        repository_path: path,
+      });
+
+      onAnalyze(response.data);
+    } catch (error) {
+      console.error(error);
+      alert("Repository analysis failed.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-8">
-
       <h2 className="text-2xl font-bold mb-2">
         Repository Analyzer
       </h2>
@@ -39,19 +39,19 @@ function AnalyzeCard() {
 
       <input
         type="text"
-        placeholder="C:\Users\YourName\Desktop\Repository"
         value={path}
         onChange={(e) => setPath(e.target.value)}
+        placeholder="C:\Users\YourName\Repository"
         className="w-full border rounded-lg p-3 mb-5"
       />
 
       <button
         onClick={handleAnalyze}
-        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+        disabled={loading}
+        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition"
       >
-        Analyze Repository
+        {loading ? "Analyzing..." : "Analyze Repository"}
       </button>
-
     </div>
   );
 }
