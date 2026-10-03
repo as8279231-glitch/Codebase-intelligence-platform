@@ -74,7 +74,6 @@ def calculate_repository_complexity(repository_path: str):
     python_files = sorted(
         repository.rglob("*.py")
     )
-
     results = []
 
     total_functions = 0
@@ -83,6 +82,11 @@ def calculate_repository_complexity(repository_path: str):
     highest_complexity = 0
     highest_complexity_function = "N/A"
     highest_complexity_file = "N/A"
+
+# -------------------------
+# Complexity Distribution
+# -------------------------
+    complexity_distribution = {}
 
     for file in python_files:
 
@@ -99,6 +103,13 @@ def calculate_repository_complexity(repository_path: str):
                 total_functions += 1
 
                 total_complexity += function["complexity"]
+
+                level = function["complexity"]
+
+                if level not in complexity_distribution:
+                   complexity_distribution[level] = 0
+
+                complexity_distribution[level] += 1
 
                 if function["complexity"] > highest_complexity:
 
@@ -129,15 +140,30 @@ def calculate_repository_complexity(repository_path: str):
         average_complexity = 0
 
     return {
-        "repository": repository.name,
-        "total_python_files": len(python_files),
+    "repository": repository.name,
 
-        "total_functions": total_functions,
-        "average_complexity": average_complexity,
+    "total_python_files": len(python_files),
 
-        "highest_complexity": highest_complexity,
-        "highest_complexity_function": highest_complexity_function,
-        "highest_complexity_file": highest_complexity_file,
+    "total_functions": total_functions,
 
-        "complexity": results
-    }
+    "average_complexity": average_complexity,
+
+    "highest_complexity": highest_complexity,
+
+    "highest_complexity_function": highest_complexity_function,
+
+    "highest_complexity_file": highest_complexity_file,
+
+    "complexity_distribution": {
+        "labels": [
+            str(x)
+            for x in sorted(complexity_distribution.keys())
+        ],
+        "values": [
+            complexity_distribution[x]
+            for x in sorted(complexity_distribution.keys())
+        ]
+    },
+
+    "complexity": results
+}

@@ -14,44 +14,61 @@ def generate_repository_charts(
 
     charts = {}
 
-    # -----------------------------
+    # ----------------------------------
     # Language Distribution
-    # -----------------------------
+    # ----------------------------------
 
     charts["language_distribution"] = {
         "type": "pie",
         "title": "Language Distribution",
-        "labels": list(language_statistics["languages"].keys()),
-        "values": list(language_statistics["languages"].values())
+        "labels": list(
+            language_statistics["languages"].keys()
+        ),
+        "values": list(
+            language_statistics["languages"].values()
+        ),
     }
 
-    # -----------------------------
+    # ----------------------------------
     # Complexity Distribution
-    # -----------------------------
+    # ----------------------------------
 
-    complexity_levels = Counter()
+    if "complexity_distribution" in complexity:
 
-    for file in complexity.get("files", []):
+        charts["complexity_distribution"] = {
+            "type": "bar",
+            "title": "Complexity Distribution",
+            "labels": complexity["complexity_distribution"]["labels"],
+            "values": complexity["complexity_distribution"]["values"],
+        }
 
-        score = file.get("complexity", 0)
+    else:
 
-        if score <= 5:
-            complexity_levels["Low"] += 1
-        elif score <= 10:
-            complexity_levels["Medium"] += 1
-        else:
-            complexity_levels["High"] += 1
+        complexity_levels = Counter()
 
-    charts["complexity_distribution"] = {
-        "type": "bar",
-        "title": "Complexity Distribution",
-        "labels": list(complexity_levels.keys()),
-        "values": list(complexity_levels.values())
-    }
+        for file in complexity.get("complexity", []):
 
-    # -----------------------------
-    # Issues
-    # -----------------------------
+            for function in file.get("functions", []):
+
+                score = function.get("complexity", 1)
+
+                if score <= 5:
+                    complexity_levels["Low"] += 1
+                elif score <= 10:
+                    complexity_levels["Medium"] += 1
+                else:
+                    complexity_levels["High"] += 1
+
+        charts["complexity_distribution"] = {
+            "type": "bar",
+            "title": "Complexity Distribution",
+            "labels": list(complexity_levels.keys()),
+            "values": list(complexity_levels.values()),
+        }
+
+    # ----------------------------------
+    # Repository Issues
+    # ----------------------------------
 
     charts["issue_breakdown"] = {
         "type": "bar",
@@ -60,24 +77,24 @@ def generate_repository_charts(
             "Security",
             "Code Smells",
             "TODOs",
-            "Dead Code"
+            "Dead Code",
         ],
         "values": [
             security.get("total_issues", 0),
             code_smells.get("total_smells", 0),
             todos.get("total_items", 0),
-            dead_code.get("unused_count", 0)
-        ]
+            dead_code.get("unused_count", 0),
+        ],
     }
 
-    # -----------------------------
-    # Health Score
-    # -----------------------------
+    # ----------------------------------
+    # Health Gauge
+    # ----------------------------------
 
     charts["health_score"] = {
         "type": "gauge",
         "title": "Repository Health",
-       "value": health.get("score",0)
+        "value": health.get("score", 0),
     }
 
     return charts
